@@ -312,8 +312,10 @@ export default mixins(
           light: this.light,
           max: this.selecting === SelectingTimes.Hour ? (this.isAmPm && this.period === 'am' ? 11 : 23) : 59,
           min: this.selecting === SelectingTimes.Hour && this.isAmPm && this.period === 'pm' ? 12 : 0,
+          period: this.period,
           readonly: this.readonly,
           scrollable: this.scrollable,
+          showAmPm: !this.ampmInTitle && this.isAmPm,
           size: Number(this.width) - ((!this.fullWidth && this.landscape) ? 80 : 20),
           step: this.selecting === SelectingTimes.Hour ? 1 : 5,
           value: this.selecting === SelectingTimes.Hour
@@ -324,7 +326,8 @@ export default mixins(
         },
         on: {
           input: this.onInput,
-          change: this.onChange
+          change: this.onChange,
+          'update:period': this.setPeriod
         },
         ref: 'clock'
       })
@@ -338,13 +341,14 @@ export default mixins(
       ])
     },
     genPickerBody () {
-      return this.$createElement('div', {
-        staticClass: 'v-time-picker-clock__container',
-        key: this.selecting
-      }, [
-        !this.ampmInTitle && this.isAmPm && this.genClockAmPm(),
-        this.genClock()
-      ])
+      // return this.$createElement('div', {
+      //   staticClass: 'v-time-picker-clock__container',
+      //   key: this.selecting
+      // }, [
+      //   !this.ampmInTitle && this.isAmPm && this.genClockAmPm(),
+      //   this.genClock()
+      // ])
+      return this.genClock()
     },
     genPickerTitle () {
       return this.$createElement(VTimePickerTitle, {

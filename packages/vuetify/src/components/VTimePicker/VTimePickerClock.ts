@@ -7,6 +7,7 @@ import Themeable from '../../mixins/themeable'
 // Types
 import mixins, { ExtractVue } from '../../util/mixins'
 import Vue, { VNode } from 'vue'
+import VPickerBtn from '../VPicker/VPickerBtn'
 
 interface Point {
   x: number
@@ -36,7 +37,6 @@ export default mixins<options &
 
   props: {
     allowedValues: Function,
-    ampm: Boolean,
     disabled: Boolean,
     double: Boolean,
     format: {
@@ -51,7 +51,9 @@ export default mixins<options &
       type: Number,
       required: true
     },
+    period: String,
     scrollable: Boolean,
+    showAmPm: Boolean,
     readonly: Boolean,
     rotate: {
       type: Number,
@@ -231,38 +233,70 @@ export default mixins<options &
     angle (center: Point, p1: Point) {
       const value = 2 * Math.atan2(p1.y - center.y - this.euclidean(center, p1), p1.x - center.x)
       return Math.abs(value * 180 / Math.PI)
+    },
+    genClock () {
+      const data = {
+        staticClass: 'v-time-picker-clock',
+        class: {
+          'v-time-picker-clock--indeterminate': this.value == null,
+          ...this.themeClasses
+        },
+        on: (this.readonly || this.disabled) ? undefined : Object.assign({
+          mousedown: this.onMouseDown,
+          mouseup: this.onMouseUp,
+          mouseleave: () => (this.isDragging && this.onMouseUp()),
+          touchstart: this.onMouseDown,
+          touchend: this.onMouseUp,
+          mousemove: this.onDragMove,
+          touchmove: this.onDragMove
+        }, this.scrollable ? {
+          wheel: this.wheel
+        } : {}),
+        ref: 'clock'
+      }
+
+      return this.$createElement('div', data, [
+        this.$createElement('div', {
+          staticClass: 'v-time-picker-clock__inner',
+          ref: 'innerClock'
+        }, [
+          this.genHand(),
+          this.genValues()
+        ])
+      ])
+    },
+    genClockAmPm () {
+      return this.$createElement('div', this.setTextColor(this.color || 'primary', {
+        staticClass: 'v-time-picker-clock__ampm'
+      }), [
+        this.$createElement(VPickerBtn, {
+          props: {
+            active: this.period === 'am',
+            readonly: this.disabled || this.readonly
+          },
+          on: {
+            click: () => this.$emit('update:period', 'am')
+          }
+        }, ['AM']),
+        this.$createElement(VPickerBtn, {
+          props: {
+            active: this.period === 'pm',
+            readonly: this.disabled || this.readonly
+          },
+          on: {
+            click: () => this.$emit('update:period', 'pm')
+          }
+        }, ['PM'])
+      ])
     }
   },
 
   render (h): VNode {
-    const data = {
-      staticClass: 'v-time-picker-clock',
-      class: {
-        'v-time-picker-clock--indeterminate': this.value == null,
-        ...this.themeClasses
-      },
-      on: (this.readonly || this.disabled) ? undefined : Object.assign({
-        mousedown: this.onMouseDown,
-        mouseup: this.onMouseUp,
-        mouseleave: () => (this.isDragging && this.onMouseUp()),
-        touchstart: this.onMouseDown,
-        touchend: this.onMouseUp,
-        mousemove: this.onDragMove,
-        touchmove: this.onDragMove
-      }, this.scrollable ? {
-        wheel: this.wheel
-      } : {}),
-      ref: 'clock'
-    }
-
-    return h('div', data, [
-      h('div', {
-        staticClass: 'v-time-picker-clock__inner',
-        ref: 'innerClock'
-      }, [
-        this.genHand(),
-        this.genValues()
-      ])
+    return this.$createElement('div', {
+      staticClass: 'v-time-picker-clock__container'
+    }, [
+      this.showAmPm && this.genClockAmPm(),
+      this.genClock()
     ])
   }
 })

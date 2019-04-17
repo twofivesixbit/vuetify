@@ -10,7 +10,7 @@ import { VTabs, VTab } from '../VTabs'
 
 // Mixins
 import { VDatePickerTitle } from '../VDatePicker'
-import { VTimePickerTitle } from '../VTimePicker'
+import { VTimePickerTitle, VTimePickerClock } from '../VTimePicker'
 
 export default Vue.extend({
   name: 'v-date-time-picker',
@@ -20,6 +20,7 @@ export default Vue.extend({
   },
 
   data: () => ({
+    mode: 'time',
     date: '2019-04-01'
   }),
 
@@ -50,6 +51,24 @@ export default Vue.extend({
         }),
         this.$createElement(VTimePickerTitle)
       ])
+    },
+    genDatePicker () {
+      return this.$createElement('div')
+    },
+    genTimePicker () {
+      return this.$createElement(VTimePickerClock, {
+        props: {
+          min: 0,
+          max: 12
+        }
+      })
+    },
+    genBody () {
+      if (this.mode === 'time') {
+        return this.genTimePicker()
+      } else {
+        return this.genDatePicker()
+      }
     }
   },
 
@@ -62,7 +81,7 @@ export default Vue.extend({
         this.genHeaders(),
         this.genTabs()
       ]),
-      h('div', ['body'])
+      this.genBody()
     ])
   }
 })
