@@ -22,19 +22,16 @@
       background-color: map-deep-get($material, 'picker', 'indeterminateTime')
 
 .v-time-picker-clock
+  width: 100%
+  height: 100%
   border-radius: 100%
   position: relative
+  display: flex
+  flex-direction: column
+  justify-content: center
+  padding: $time-picker-clock-padding
   transition: $primary-transition
   user-select: none
-  width: 100%
-  padding-top: 100%
-  flex: 1 0 auto
-
-  &__container
-    display: flex
-    flex-direction: column
-    justify-content: center
-    padding: $time-picker-clock-padding
 
   &__ampm
     display: flex

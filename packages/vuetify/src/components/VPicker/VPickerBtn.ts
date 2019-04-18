@@ -1,4 +1,4 @@
-import Vue, { VNode } from 'vue'
+import Vue, { VNode, CreateElement, VNodeChildren } from 'vue'
 import { wrapInArray } from '../../util/helpers'
 
 export default Vue.extend({
