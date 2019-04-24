@@ -8,9 +8,11 @@ import VIcon from '../VIcon'
 import colors from '../../util/colors'
 import { VColorPickerColor, fromHex, parseColor } from './util'
 import { convertToUnit, deepEqual } from '../../util/helpers'
+import mixins from '../../util/mixins'
+import Themeable from '../../mixins/themeable'
 
 // Types
-import Vue, { VNode } from 'vue'
+import { VNode } from 'vue'
 import { PropValidator } from 'vue/types/options'
 import { contrastRatio } from '../../util/colorUtils'
 
@@ -36,9 +38,10 @@ function parseDefaultColors (colors: Record<string, Record<string, string>>) {
   })
 }
 
-const white = fromHex('#FFFFFF')
+const white = fromHex('#FFFFFF').rgba
+const black = fromHex('#000000').rgba
 
-export default Vue.extend({
+export default mixins(Themeable).extend({
   name: 'v-color-picker-swatches',
 
   props: {
@@ -53,6 +56,7 @@ export default Vue.extend({
 
   methods: {
     genColor (color: string) {
+      console.log(this.color.hex, contrastRatio(this.color.rgba, white))
       const content = this.$createElement('div', {
         style: {
           background: color
@@ -61,7 +65,7 @@ export default Vue.extend({
         deepEqual(this.color, parseColor(color)) && this.$createElement(VIcon, {
           props: {
             small: true,
-            dark: contrastRatio(this.color.rgba, white.rgba) > 2 && this.color.alpha > 0.5
+            dark: contrastRatio(this.color.rgba, this.dark ? black : white) > 2 && this.color.alpha > 0.5
           }
         }, '$vuetify.icons.success')
       ])
